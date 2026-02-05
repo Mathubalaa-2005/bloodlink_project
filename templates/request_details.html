@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Details - BLOOD LINK{% endblock %}
+
+{% block content %}
+<section class="request-details-section py-4">
+    <div class="container">
+
+        <!-- Request Header -->
+        {% set status = request.status | default('pending') %}
+        <div class="card mb-4
+            {% if status == 'fulfilled' %}bg-success
+            {% elif status == 'partial' %}bg-warning
+            {% else %}bg-danger
+            {% endif %}
+            text-white
+        ">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3>
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Blood Request #{{ request.request_id }}
+                        </h3>
+
+                        <span class="badge bg-light text-dark fs-6 me-2">
+                            {{ request.blood_group }}
+                        </span>
+
+                        <span class="badge fs-6 me-2
+                            {% if request.urgency == 'critical' %}bg-dark
+                            {% elif request.urgency == 'high' %}bg-warning text-dark
+                            {% else %}bg-info
+                            {% endif %}
+                        ">
+                            {{ request.urgency | upper }} PRIORITY
+                        </span>
+
+                        <span class="badge bg-light text-dark fs-6">
+                            Status: {{ status | upper }}
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <p class="mb-1">
+                            <i class="fas fa-calendar me-2"></i>
+                            Created: {{ request.created_at[:10] if request.created_at else '' }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-clock me-2"></i>
+                            Required by: {{ request.required_date }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <!-- Patient Info -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="card-header bg-danger text-white">
+                        Patient Information
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Name</span>
+                            <strong>{{ request.patient_name }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Age</span>
+                            <strong>{{ request.patient_age }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Gender</span>
+                            <strong>{{ request.patient_gender }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Blood Group</span>
+                            <span class="badge bg-danger">{{ request.blood_group }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Units Needed</span>
+                            <strong>{{ request.units_needed }}</strong>
+                        </li>
+                        {% if request.fulfilled_units | default(0) | int > 0 %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Fulfilled</span>
+                            <strong class="text-success">
+                                {{ request.fulfilled_units }}
+                            </strong>
+                        </li>
+                        {% endif %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Remaining Units Needed</span>
+                            <strong class="text-warning">
+                                {{ request.units_needed - (request.fulfilled_units | default(0) | int) }}
+                            </strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Hospital Info -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="card-header bg-danger text-white">
+                        Hospital Information
+                    </div>
+                    <div class="card-body">
+                        <p><strong>{{ request.hospital_name }}</strong></p>
+                        <p>{{ request.hospital_address }}</p>
+                        <p>{{ request.city }}, {{ request.state }}</p>
+                        <hr>
+                        <p>{{ request.contact_name }}</p>
+                        <p>{{ request.contact_phone }}</p>
+                        {% if request.contact_email %}
+                        <p>{{ request.contact_email }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matching Results -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="card-header bg-danger text-white">
+                        Matching Results
+                    </div>
+                    <div class="card-body">
+
+                        {% set can_fulfill = match_results.fulfillable | default(false) %}
+                        <div class="alert {% if can_fulfill %}alert-success{% else %}alert-warning{% endif %}">
+                            {% if can_fulfill %}
+                                Request can be fulfilled
+                            {% else %}
+                                Limited availability
+                            {% endif %}
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Exact Match Inventory</span>
+                                <span class="badge bg-info">
+                                    {{ match_results.exact_match_inventory | default(0) }}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Compatible Donors</span>
+                                <span class="badge bg-primary">
+                                    {{ match_results.total_compatible | default(0) }}
+                                </span>
+                            </li>
+                        </ul>
+
+                        {% if status != 'fulfilled' %}
+                        <button class="btn btn-success w-100 mt-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#fulfillModal">
+                            Mark as Fulfilled
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Compatible Donors -->
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                Compatible Donors
+            </div>
+
+            <div class="card-body">
+                {% if match_results.compatible_donors | default([]) %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Blood</th>
+                                <th>Location</th>
+                                <th>Match</th>
+                                <th>Status</th>
+                                <th>Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for donor in match_results.compatible_donors %}
+                        {% set score = donor.match_score | default(0) | int %}
+
+                        {% if score >= 100 %}
+                            {% set bar = 'w-100 bg-success' %}
+                        {% elif score >= 70 %}
+                            {% set bar = 'w-75 bg-info' %}
+                        {% elif score >= 40 %}
+                            {% set bar = 'w-50 bg-warning' %}
+                        {% else %}
+                            {% set bar = 'w-25 bg-danger' %}
+                        {% endif %}
+
+                        <tr>
+                            <td>{{ donor.donor_id }}</td>
+                            <td>{{ donor.name }}</td>
+                            <td><span class="badge bg-danger">{{ donor.blood_group }}</span></td>
+                            <td>{{ donor.city }}, {{ donor.state }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar {{ bar }}">
+                                        {{ score }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if donor.can_donate_now %}
+                                    <span class="badge bg-success">Ready</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Wait</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="tel:{{ donor.phone }}" class="btn btn-sm btn-outline-success">
+                                    Call
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    No compatible donors found.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% if status != 'fulfilled' %}
+<div class="modal fade" id="fulfillModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('fulfill_request', request_id=request.request_id) }}">
+                <div class="modal-header bg-success text-white">
+                    <h5>Confirm Fulfillment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Units Fulfilled</label>
+                    <input type="number" class="form-control"
+                           name="units_fulfilled"
+                           min="1"
+                           max="{{ request.units_needed }}"
+                           required>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" type="submit">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

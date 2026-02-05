@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 380" width="300" height="380">
+  <defs>
+    <style>
+      .blood-drop-main { fill: #E63946; }
+      .hand-line { fill: none; stroke: white; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+      .text-main { font-family: 'Arial', sans-serif; font-size: 56px; font-weight: 900; fill: #1a1a1a; letter-spacing: -2px; }
+      .text-infinity { fill: #E63946; }
+    </style>
+  </defs>
+
+  <!-- Blood Drop Shape -->
+  <ellipse cx="150" cy="130" rx="85" ry="95" class="blood-drop-main"/>
+  <path d="M 150 30 Q 210 80 215 150 Q 215 220 150 225 Q 85 220 85 150 Q 90 80 150 30 Z" class="blood-drop-main"/>
+
+  <!-- Hand/Helping Gesture Inside Drop -->
+  <g transform="translate(150, 85)">
+    <!-- Thumb/palm left curve -->
+    <path d="M -35 45 Q -50 35 -55 10" class="hand-line"/>
+    <!-- Index finger -->
+    <path d="M -15 0 Q -20 -25 -18 -50" class="hand-line"/>
+    <!-- Middle finger (tallest) -->
+    <path d="M 0 -8 Q 0 -35 5 -60" class="hand-line"/>
+    <!-- Ring finger -->
+    <path d="M 18 0 Q 22 -25 28 -50" class="hand-line"/>
+    <!-- Pinky finger -->
+    <path d="M 35 15 Q 45 0 55 -25" class="hand-line"/>
+  </g>
+
+  <!-- Text: "BloodLink" with infinity symbol for "oo" -->
+  <g transform="translate(0, 280)">
+    <text x="35" y="70" class="text-main">Bl</text>
+    
+    <!-- Infinity symbol (oo replacement) -->
+    <g transform="translate(110, 50)">
+      <path d="M 25 10 C 15 0 15 20 25 20 C 35 20 35 0 25 10 M 45 10 C 35 0 35 20 45 20 C 55 20 55 0 45 10" 
+            class="text-infinity" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M 20 10 C 20 5 20 15 20 10 M 50 10 C 50 5 50 15 50 10" 
+            class="text-infinity" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    
+    <!-- "dLink" -->
+    <text x="180" y="70" class="text-main">dLink</text>
+  </g>
+</svg>

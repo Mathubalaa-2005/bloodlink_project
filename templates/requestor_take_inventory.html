@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Take Blood from Inventory - BloodSync{% endblock %}
+
+{% block content %}
+<style>
+    /* Default dark text for readability */
+    body, section, .card {
+        color: #2c3e50;
+    }
+    
+    /* Light backgrounds get dark text */
+    .card-body, .alert-info, .alert-light, .alert-warning, .list-group-item {
+        color: #2c3e50 !important;
+    }
+    .card-body p, .card-body span, .card-body label, .card-body strong {
+        color: #2c3e50 !important;
+    }
+    
+    /* Dark backgrounds get white text */
+    .bg-danger, .bg-primary, .bg-success {
+        color: white !important;
+    }
+    .bg-danger *, .bg-primary *, .bg-success * {
+        color: white !important;
+    }
+    .card.bg-danger, .card.bg-primary, .card.bg-success {
+        color: white !important;
+    }
+    
+    /* Medium backgrounds - warning (yellow) and info (cyan) get dark text */
+    .bg-warning, .bg-info, .card.bg-warning, .card.bg-info {
+        color: #2c3e50 !important;
+    }
+    .bg-warning *, .bg-info * {
+        color: #2c3e50 !important;
+    }
+    
+    /* Form elements */
+    .form-label, label {
+        color: #2c3e50 !important;
+    }
+    .form-control, .form-select {
+        background-color: rgba(255,255,255,0.95) !important;
+        border-color: #ddd !important;
+        color: #2c3e50 !important;
+    }
+    .form-control::placeholder {
+        color: #999 !important;
+    }
+</style>
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-lg border-success">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-warehouse me-2"></i>
+                            Take Blood from Inventory
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Requestor Info -->
+                        <div class="alert alert-info mb-4">
+                            <p class="mb-1"><strong>Organization:</strong> {{ requestor.organization or requestor.name }}</p>
+                            <p class="mb-1"><strong>Contact:</strong> {{ requestor.name }}</p>
+                            <p class="mb-0"><strong>Requestor ID:</strong> <code>{{ requestor.requestor_id }}</code></p>
+                        </div>
+
+                        <!-- Current Inventory -->
+                        <div class="mb-4">
+                            <h6 class="mb-2">
+                                <i class="fas fa-chart-bar me-2 text-success"></i>
+                                <strong>Current Blood Inventory</strong>
+                            </h6>
+                            <div class="row">
+                                {% for bg, inv in inventory.items() %}
+                                <div class="col-md-6 col-lg-4 mb-2">
+                                    <div class="card bg-light text-center p-2">
+                                        <small class="text-muted">{{ bg }}</small>
+                                        <h5 class="mb-0">
+                                            <span class="badge bg-danger">{{ inv.units }} units</span>
+                                        </h5>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Request Form -->
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="blood_group" class="form-label">
+                                    <i class="fas fa-tint me-1 text-danger"></i>
+                                    <strong>Blood Group Required *</strong>
+                                </label>
+                                <select class="form-select form-select-lg" id="blood_group" name="blood_group" required>
+                                    <option value="">-- Select Blood Group --</option>
+                                    {% for bg in inventory.keys() %}
+                                    <option value="{{ bg }}">{{ bg }} ({{ inventory[bg].units }} available)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="units_needed" class="form-label">
+                                    <i class="fas fa-droplet me-1 text-danger"></i>
+                                    <strong>Units Required *</strong>
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="units_needed" 
+                                       name="units_needed" min="1" max="100" value="5" required>
+                                <small class="form-text text-muted">Enter the number of units needed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="hospital_name" class="form-label">
+                                    <i class="fas fa-hospital me-1"></i>
+                                    <strong>Hospital/Facility Name</strong>
+                                </label>
+                                <input type="text" class="form-control" id="hospital_name" name="hospital_name" 
+                                       value="{{ requestor.organization or '' }}" placeholder="Enter hospital name">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="required_date" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <strong>Required By Date</strong>
+                                </label>
+                                <input type="date" class="form-control" id="required_date" name="required_date" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="reason" class="form-label">
+                                    <i class="fas fa-clipboard me-1"></i>
+                                    <strong>Reason for Request (Optional)</strong>
+                                </label>
+                                <textarea class="form-control" id="reason" name="reason" rows="3" 
+                                          placeholder="e.g., Emergency surgery, transfusion needed..."></textarea>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Request Blood from Inventory
+                                </button>
+                                <a href="{{ url_for('requestor_dashboard', requestor_id=requestor.requestor_id) }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Back to Dashboard
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Important Info -->
+                        <div class="alert alert-warning mt-4">
+                            <h6 class="mb-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Important Notes</strong>
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Blood will be deducted from inventory immediately upon confirmation</li>
+                                <li>Ensure the blood group is correct before submitting</li>
+                                <li>The request must not exceed available units</li>
+                                <li>All blood withdrawals are tracked and logged</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Set today's date as minimum required date
+    document.getElementById('required_date').min = new Date().toISOString().split('T')[0];
+    document.getElementById('required_date').value = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

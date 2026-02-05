@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Donate to Inventory - BloodSync{% endblock %}
+
+{% block content %}
+<style>
+    /* Default dark text for readability */
+    body, section, .card {
+        color: #2c3e50;
+    }
+    
+    /* Light backgrounds get dark text */
+    .card-body, .alert-info, .alert-light, .alert-warning, .list-group-item {
+        color: #2c3e50 !important;
+    }
+    .card-body p, .card-body span, .card-body label, .card-body strong {
+        color: #2c3e50 !important;
+    }
+    
+    /* Dark backgrounds get white text */
+    .bg-danger, .bg-primary, .bg-success {
+        color: white !important;
+    }
+    .bg-danger *, .bg-primary *, .bg-success * {
+        color: white !important;
+    }
+    .card.bg-danger, .card.bg-primary, .card.bg-success {
+        color: white !important;
+    }
+    
+    /* Form elements */
+    .form-label, label {
+        color: #2c3e50 !important;
+    }
+    .form-control, .form-select {
+        background-color: rgba(255,255,255,0.95) !important;
+        border-color: #ddd !important;
+        color: #2c3e50 !important;
+    }
+    .form-control::placeholder {
+        color: #999 !important;
+    }
+</style>
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-hand-holding-heart me-2"></i>
+                            Donate Blood to Inventory
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Donor Info -->
+                        <div class="alert alert-info mb-4">
+                            <p class="mb-1"><strong>Donor:</strong> {{ donor.name }}</p>
+                            <p class="mb-1"><strong>Blood Group:</strong> <span class="badge bg-danger">{{ donor.blood_group }}</span></p>
+                            <p class="mb-0"><strong>Donor ID:</strong> <code>{{ donor.donor_id }}</code></p>
+                        </div>
+
+                        <!-- Eligibility Status -->
+                        {% if can_donate_now %}
+                            <div class="alert alert-success mb-4">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>✓ You are eligible to donate blood</strong>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning mb-4">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>⚠ You must wait 56 days between donations</strong>
+                                <p class="mb-0 small mt-2">Last donation: {{ donor.last_donation or 'Never' }}</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Donation Form -->
+                        <form method="POST" {% if not can_donate_now %}disabled{% endif %}>
+                            <div class="mb-3">
+                                <label for="units" class="form-label">
+                                    <i class="fas fa-tint me-1 text-danger"></i>
+                                    <strong>Units to Donate</strong>
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="units" name="units" 
+                                       min="1" max="50" value="2" required>
+                                <small class="form-text text-muted">Enter between 1 and 50 units</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="donation_center" class="form-label">
+                                    <i class="fas fa-hospital me-1"></i>
+                                    <strong>Donation Center</strong>
+                                </label>
+                                <input type="text" class="form-control" id="donation_center" name="donation_center" 
+                                       value="Main Blood Bank" placeholder="Enter donation center">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="notes" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    <strong>Additional Notes (Optional)</strong>
+                                </label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                          placeholder="Any additional information..."></textarea>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger btn-lg" {% if not can_donate_now %}disabled{% endif %}>
+                                    <i class="fas fa-heart me-2"></i>
+                                    Donate {{ donor.blood_group }} Blood
+                                </button>
+                                <a href="{{ url_for('donor_dashboard', donor_id=donor.donor_id) }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Back to Dashboard
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Info Box -->
+                        <div class="alert alert-light mt-4 border border-secondary">
+                            <h6 class="mb-2">
+                                <i class="fas fa-info-circle me-2 text-info"></i>
+                                <strong>About Donating to Inventory</strong>
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Your donated blood will be stored in the main blood bank inventory</li>
+                                <li>It will be available for hospitals and patients who need it</li>
+                                <li>Your donation will be tracked and recorded in your history</li>
+                                <li>Thank you for saving lives! 🩸</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

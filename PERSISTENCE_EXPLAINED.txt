@@ -1,0 +1,77 @@
+# BloodSync - Data Persistence ✅
+
+## Your Issue is FIXED! 🎉
+
+### What Was the Problem?
+When you registered as a donor or requestor and then reloaded the website, your data was lost. This happened because the data was only stored in the computer's memory (RAM), which gets erased when you restart the application.
+
+### What's Fixed Now?
+Your registration data is now **PERMANENTLY SAVED** to files on your computer. When you restart the application, all your donor and requestor registrations will still be there!
+
+---
+
+## How to Use It
+
+### For Donors:
+1. Go to "Register as Donor"
+2. Fill in your details and submit
+3. Your donor profile is **automatically saved** ✓
+4. Next time you login, your profile will be there
+
+### For Requestors:
+1. Go to "Register as Requestor"  
+2. Fill in your organization details and submit
+3. Your requestor profile is **automatically saved** ✓
+4. Next time you login, your profile will be there
+
+### For Blood Requests:
+1. Create a blood request
+2. Your request is **automatically saved** ✓
+3. All donation history is preserved
+
+---
+
+## Where is My Data Stored?
+
+Your data is saved in files in the `data/` folder:
+- **donors.json** - All donor registrations
+- **requestors.json** - All requestor registrations
+- **blood_requests.json** - All blood requests
+- **donations.json** - All donation records
+- **inventory.json** - Blood bank inventory
+- **assignments.json** - Donor-request matches
+
+These files are created automatically on first run.
+
+---
+
+## What Data is Saved?
+
+✅ Donor registration details (name, phone, blood group, age, weight, etc.)
+✅ Requestor information (name, email, organization, address, etc.)
+✅ Blood request information (patient name, blood group needed, hospital, etc.)
+✅ Donation history (who donated, how much, when, etc.)
+✅ Blood inventory levels
+✅ Donor-request assignments
+
+---
+
+## Verification
+
+The data files are located at:
+```
+c:\Users\acer\Desktop\BloodSync\bloodsync\data\
+```
+
+You can open these JSON files to see your data is saved!
+
+---
+
+## No Manual Saving Required!
+
+✓ Everything is automatic
+✓ You don't need to click "Save"
+✓ Data saves instantly when you register/donate
+✓ Data persists even after application restart
+
+**Happy blood banking! 🩸**

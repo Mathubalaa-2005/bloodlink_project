@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration Successful - BLOOD LINK{% endblock %}
+
+{% block content %}
+<section class="registration-success py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h2 class="fw-bold">Successfully Registered</h2>
+                        <p class="lead">Thank you for registering as a {{ role|capitalize }}.</p>
+                        <p class="text-muted">Your registration ID has been generated. Please save it somewhere safe.</p>
+                        <div class="mt-4">
+                            <a href="{{ url_for('home') }}" class="btn btn-danger btn-lg">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Registration ID Modal -->
+<div class="modal fade" id="registrationIdModal" tabindex="-1" backdrop="static" keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-id-badge me-2"></i>Your {{ role|capitalize }} ID</h5>
+            </div>
+            <div class="modal-body text-center py-5">
+                <p class="text-muted mb-3">Save this ID for future login and reference:</p>
+                <div class="card bg-light border-danger mb-4">
+                    <div class="card-body">
+                        <h4 class="fw-bold text-danger" id="idDisplay">{{ entity_id }}</h4>
+                    </div>
+                </div>
+                <p class="small text-muted">⚠️ Write it down or save it. You'll need it to log in.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" onclick="copyToClipboard()">
+                    <i class="fas fa-copy me-2"></i>Copy ID
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show modal on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('registrationIdModal'));
+        modal.show();
+    });
+
+    // Copy ID to clipboard function with improved compatibility
+    function copyToClipboard() {
+        const idText = document.getElementById('idDisplay').innerText.trim();
+        const copyBtn = document.querySelector('button[onclick="copyToClipboard()"]');
+        
+        if (!copyBtn) return;
+        
+        const originalHTML = copyBtn.innerHTML;
+        const originalClasses = 'btn btn-outline-danger';
+        
+        // Try modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(idText).then(() => {
+                showCopySuccess(copyBtn, originalHTML, originalClasses);
+            }).catch(() => {
+                fallbackCopy(idText, copyBtn, originalHTML, originalClasses);
+            });
+        } else {
+            // Fallback for older browsers
+            fallbackCopy(idText, copyBtn, originalHTML, originalClasses);
+        }
+    }
+    
+    function showCopySuccess(button, originalHTML, originalClass) {
+        button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+        button.classList.remove('btn-outline-danger');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-danger');
+        }, 2000);
+    }
+    
+    function fallbackCopy(text, button, originalHTML, originalClass) {
+        // Create temporary textarea element
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        
+        try {
+            textarea.select();
+            document.execCommand('copy');
+            showCopySuccess(button, originalHTML, originalClass);
+        } catch (err) {
+            alert('Failed to copy. Please copy manually: ' + text);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
+</script>
+{% endblock %}

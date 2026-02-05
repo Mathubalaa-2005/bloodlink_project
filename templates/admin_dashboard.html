@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Dashboard{% endblock %}
+
+{% block content %}
+<section class="clean-dashboard py-4">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2>Admin Dashboard</h2>
+      </div>
+    </div>
+
+    <!-- Key stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card clean">
+          <div class="card-body text-center">
+            <div class="stat-value">{{ stats.total_donors }}</div>
+            <div class="stat-label">Donors</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card clean">
+          <div class="card-body text-center">
+            <div class="stat-value">{{ stats.total_requests }}</div>
+            <div class="stat-label">Requests</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card clean">
+          <div class="card-body text-center">
+            <div class="stat-value">{{ stats.fulfilled_requests }}</div>
+            <div class="stat-label">Fulfilled</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card clean">
+          <div class="card-body text-center">
+            <div class="stat-value">{{ stats.total_units }}</div>
+            <div class="stat-label">Units</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            Recent Registrations
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              {% if registrations %}
+                {% for r in registrations %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="fw-bold">{{ r.name }}</div>
+                      <div class="small text-muted">{{ r.city }}{% if r.state %}, {{ r.state }}{% endif %}</div>
+                    </div>
+                    <div class="text-end small">
+                      <div class="badge bg-danger">{{ r.blood_group }}</div>
+                      <div class="text-muted">{{ r.registered_at }}</div>
+                    </div>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="list-group-item">No registrations yet.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            Recent Donations
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              {% if recent_donations %}
+                {% for d in recent_donations %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="fw-bold">{{ d.donor_name or d.donor_id }}</div>
+                      <div class="small text-muted">{{ d.donation_center or '—' }}</div>
+                    </div>
+                    <div class="text-end small">
+                      <div>{{ d.units }} unit{{ 's' if d.units|int != 1 else '' }}</div>
+                      <div class="text-muted">{{ d.donation_date }}</div>
+                    </div>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="list-group-item">No donations yet.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

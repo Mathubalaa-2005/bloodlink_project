@@ -1,0 +1,8 @@
+{
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "css.lint.enable": false,
+  "css.validate": false,
+  "stylelint.enable": false
+}

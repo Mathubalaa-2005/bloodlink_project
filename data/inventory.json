@@ -1,0 +1,56 @@
+{
+  "A+": {
+    "units": 45,
+    "donors": [
+      "DON-E5F6G7H8",
+      "DON-361EBA0B",
+      "DON-96B08A54",
+      "DON-37B6D86D",
+      "DON-F0B274FC",
+      "DON-7DCB1A60"
+    ]
+  },
+  "A-": {
+    "units": 30,
+    "donors": [
+      "DON-A2B3C4D5"
+    ]
+  },
+  "B+": {
+    "units": 45,
+    "donors": [
+      "DON-DF5F3F93"
+    ]
+  },
+  "B-": {
+    "units": 25,
+    "donors": [
+      "DON-I9J0K1L2"
+    ]
+  },
+  "AB+": {
+    "units": 20,
+    "donors": [
+      "DON-Q7R8S9T0",
+      "DON-68B2F8B6"
+    ]
+  },
+  "AB-": {
+    "units": 15,
+    "donors": []
+  },
+  "O+": {
+    "units": 60,
+    "donors": [
+      "DON-A1B2C3D4",
+      "DON-92127D62",
+      "DON-12D3B314"
+    ]
+  },
+  "O-": {
+    "units": 40,
+    "donors": [
+      "DON-M3N4O5P6"
+    ]
+  }
+}

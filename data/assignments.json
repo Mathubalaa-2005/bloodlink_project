@@ -1,0 +1,44 @@
+{
+  "ASGN-F615AE60": {
+    "assignment_id": "ASGN-F615AE60",
+    "donor_id": "DON-361EBA0B",
+    "request_id": "BR-B5C6D7E8",
+    "units_offered": 2,
+    "status": "accepted",
+    "accepted_at": "2026-02-05 13:38:54",
+    "donated_at": null,
+    "notes": ""
+  },
+  "ASGN-6E4396DF": {
+    "assignment_id": "ASGN-6E4396DF",
+    "donor_id": "DON-92127D62",
+    "request_id": "BR-B5C6D7E8",
+    "units_offered": 1,
+    "status": "accepted",
+    "accepted_at": "2026-02-05 14:45:30",
+    "donated_at": null,
+    "notes": ""
+  },
+  "ASGN-DFF45B7B": {
+    "assignment_id": "ASGN-DFF45B7B",
+    "donor_id": "DON-37B6D86D",
+    "request_id": "BR-B5C6D7E8",
+    "units_offered": 2,
+    "status": "completed",
+    "accepted_at": "2026-02-05 14:48:13",
+    "donated_at": "2026-02-05 14:48:18",
+    "notes": "",
+    "units_donated": 2
+  },
+  "ASGN-07402DC7": {
+    "assignment_id": "ASGN-07402DC7",
+    "donor_id": "DON-F0B274FC",
+    "request_id": "BR-B5C6D7E8",
+    "units_offered": 2,
+    "status": "completed",
+    "accepted_at": "2026-02-05 14:49:55",
+    "donated_at": "2026-02-05 14:50:00",
+    "notes": "",
+    "units_donated": 2
+  }
+}

@@ -106,7 +106,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ donor.name }}</h5>
                                 <p class="card-text">
-                                    <small class="text-muted">
+                                    <small class="text-white" style="background-color: #dc3545; padding: 4px 8px; border-radius: 3px; display: inline-block;">
                                         <i class="fas fa-id-card me-1"></i>{{ donor.donor_id }}
                                     </small>
                                 </p>
@@ -120,9 +120,15 @@
                                 </ul>
                             </div>
                             <div class="card-footer bg-transparent">
-                                <a href="tel:{{ donor.phone }}" class="btn btn-success btn-sm w-100 mb-2">
-                                    <i class="fas fa-phone me-2"></i>Call {{ donor.phone }}
-                                </a>
+                                <div class="d-flex gap-2 mb-2">
+                                    <a href="tel:{{ donor.phone }}" class="btn btn-success btn-sm flex-grow-1">
+                                        <i class="fas fa-phone me-2"></i>Call
+                                    </a>
+                                    <button class="btn btn-info btn-sm" onclick="copyToClipboard('{{ donor.phone }}', this)" 
+                                            title="Copy phone number">
+                                        <i class="fas fa-copy me-1"></i>
+                                    </button>
+                                </div>
                                 <small class="text-muted d-block text-center">
                                     <i class="fas fa-clock me-1"></i>Preferred: {{ donor.preferred_contact_time }}
                                 </small>
@@ -291,4 +297,56 @@
         </div>
     </div>
 </section>
+
+<script>
+/**
+ * Copy text to clipboard and show feedback
+ */
+function copyToClipboard(text, button) {
+    // Copy to clipboard
+    navigator.clipboard.writeText(text).then(function() {
+        // Change button appearance
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check me-1"></i>';
+        button.classList.add('btn-success');
+        button.classList.remove('btn-info');
+        
+        // Restore button after 2 seconds
+        setTimeout(function() {
+            button.innerHTML = originalIcon;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-info');
+        }, 2000);
+        
+        // Optional: Show toast notification
+        showCopyNotification('Phone number copied to clipboard!');
+    }).catch(function(err) {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy phone number');
+    });
+}
+
+/**
+ * Show notification for copy action
+ */
+function showCopyNotification(message) {
+    // Create temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-success alert-dismissible fade show';
+    notification.style.position = 'fixed';
+    notification.style.top = '100px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(function() {
+        notification.remove();
+    }, 3000);
+}
+</script>
 {% endblock %}

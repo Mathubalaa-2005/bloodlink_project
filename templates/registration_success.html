@@ -3,6 +3,16 @@
 {% block title %}Registration Successful - BLOOD LINK{% endblock %}
 
 {% block content %}
+<style>
+    /* Ensure modal header text is white */
+    .modal-header.bg-danger .modal-title {
+        color: white !important;
+    }
+    
+    .modal-header.bg-danger .modal-title * {
+        color: white !important;
+    }
+</style>
 <section class="registration-success py-5">
     <div class="container">
         <div class="row justify-content-center">
@@ -28,7 +38,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-danger">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="fas fa-id-badge me-2"></i>Your {{ role|capitalize }} ID</h5>
+                <h5 class="modal-title text-white"><i class="fas fa-id-badge me-2"></i>Your {{ role|capitalize }} ID</h5>
             </div>
             <div class="modal-body text-center py-5">
                 <p class="text-muted mb-3">Save this ID for future login and reference:</p>

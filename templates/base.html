@@ -74,6 +74,21 @@
         .navbar-dark .navbar-nav .nav-link:hover {
             color: #FFE4E8 !important;
         }
+        
+        /* Success alert text in white */
+        .alert-success {
+            color: white !important;
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+        }
+        
+        .alert-success * {
+            color: white !important;
+        }
+        
+        .alert-success .btn-close {
+            filter: brightness(0) invert(1) !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>

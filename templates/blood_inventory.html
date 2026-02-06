@@ -3,7 +3,7 @@
 {% block title %}Blood Inventory - BLOOD LINK{% endblock %}
 
 {% block content %}
-<section class="inventory-section py-5">
+<section class="inventory-section py-5" data-page="inventory">
     <div class="container">
 
         <!-- Header -->
@@ -25,7 +25,7 @@
                 <div class="card bg-primary text-white text-center h-100">
                     <div class="card-body">
                         <i class="fas fa-tint fa-3x mb-3"></i>
-                        <h3>{{ stats.total_units | default(0) }}</h3>
+                        <h3 data-stat="total-units">{{ stats.total_units | default(0) }}</h3>
                         <p>Total Units Available</p>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
                 <div class="card bg-success text-white text-center h-100">
                     <div class="card-body">
                         <i class="fas fa-check-circle fa-3x mb-3"></i>
-                        <h3>{{ stats.total_donors | default(0) }}</h3>
+                        <h3 data-stat="total-donors">{{ stats.total_donors | default(0) }}</h3>
                         <p>Registered Donors</p>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="card bg-info text-white text-center h-100">
                     <div class="card-body">
                         <i class="fas fa-clipboard-list fa-3x mb-3"></i>
-                        <h3>{{ stats.total_requests | default(0) }}</h3>
+                        <h3 data-stat="total-requests">{{ stats.total_requests | default(0) }}</h3>
                         <p>Total Requests</p>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                 <div class="card bg-warning text-dark text-center h-100">
                     <div class="card-body">
                         <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                        <h3>{{ stats.critical_groups | length }}</h3>
+                        <h3 data-stat="critical-groups">{{ stats.critical_groups | length }}</h3>
                         <p>Critical Blood Groups</p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                     {% elif units < 40 %} border-warning
                     {% else %} border-success
                     {% endif %}
-                ">
+                " data-blood-group="{{ bg }}">
 
                     <div class="card-header text-white
                         {% if units < 20 %} bg-danger
@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="card-body text-center">
-                        <h2 class="
+                        <h2 class="units-value
                             {% if units < 20 %} text-danger
                             {% elif units < 40 %} text-warning
                             {% else %} text-success
@@ -127,7 +127,7 @@
                         <p class="text-muted">Units Available</p>
                         <hr>
 
-                        <p>
+                        <p class="donor-count">
                             <i class="fas fa-users me-2"></i>
                             {{ data.donors | default([]) | length }} donor(s)
                         </p>
@@ -141,8 +141,8 @@
                             </div>
                         </div>
 
-                        <small class="d-block text-center mt-1 text-muted">
-                            {% if units < 20 %} Critical
+                        <small class="d-block text-center mt-1 text-muted status-badge">
+                            {% if units < 20 %} CRITICAL
                             {% elif units < 40 %} Low
                             {% else %} Adequate
                             {% endif %}

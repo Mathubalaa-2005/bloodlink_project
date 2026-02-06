@@ -474,15 +474,25 @@ def donor_register():
             return redirect(url_for('donor_register'))
         
         donors_db[donor_id] = donor_data
+        blood_group = donor_data['blood_group']
         
-        # Update inventory donor list
-        blood_inventory[donor_data['blood_group']]['donors'].append(donor_id)
+        # Update inventory donor list - REAL-TIME UPDATE
+        if blood_group not in blood_inventory:
+            blood_inventory[blood_group] = {'units': 0, 'donors': []}
+        
+        if donor_id not in blood_inventory[blood_group]['donors']:
+            blood_inventory[blood_group]['donors'].append(donor_id)
         
         # SAVE DATA PERSISTENTLY
         save_json_file(DONORS_FILE, donors_db)
         save_json_file(INVENTORY_FILE, blood_inventory)
         
-        flash(f'Registration successful! Your Donor ID is: {donor_id}', 'success')
+        # Log the registration with timestamp for real-time updates
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f"[{current_time}] New donor registered: {donor_id} ({blood_group})")
+        print(f"[{current_time}] Donor count for {blood_group}: {len(blood_inventory[blood_group]['donors'])}")
+        
+        flash(f'✓ Registration successful! Your Donor ID is: {donor_id}', 'success')
         return redirect(url_for('donor_dashboard', donor_id=donor_id))
     
     return render_template('donor_register.html')
@@ -1187,6 +1197,84 @@ def api_donors():
 def api_requests():
     """API endpoint for blood requests"""
     return jsonify(list(blood_requests_db.values()))
+
+@app.route('/api/inventory/real-time')
+def api_inventory_realtime():
+    """
+    Real-time API endpoint for inventory data
+    Returns inventory with donor counts and compatibility info
+    """
+    inventory_data = {}
+    for blood_group, inv_data in blood_inventory.items():
+        # Get compatible blood groups for donors
+        can_donate_to = BLOOD_COMPATIBILITY.get(blood_group, [])
+        can_receive_from = RECEIVE_COMPATIBILITY.get(blood_group, [])
+        
+        inventory_data[blood_group] = {
+            'units': inv_data.get('units', 0),
+            'donor_count': len(inv_data.get('donors', [])),
+            'donor_ids': inv_data.get('donors', []),
+            'can_donate_to': can_donate_to,
+            'can_receive_from': can_receive_from,
+            'status': 'critical' if inv_data.get('units', 0) < 20 else ('low' if inv_data.get('units', 0) < 40 else 'adequate')
+        }
+    
+    return jsonify({
+        'success': True,
+        'timestamp': datetime.now().isoformat(),
+        'inventory': inventory_data,
+        'total_units': sum(inv['units'] for inv in blood_inventory.values()),
+        'total_donors': len(donors_db),
+        'critical_groups': [bg for bg, inv in blood_inventory.items() if inv.get('units', 0) < 20]
+    })
+
+@app.route('/api/dashboard/stats')
+def api_dashboard_stats():
+    """
+    Real-time API endpoint for dashboard statistics
+    Updates whenever data changes
+    """
+    stats = get_statistics()
+    
+    # Add inventory breakdown by blood group
+    inventory_breakdown = {}
+    for blood_group, inv_data in blood_inventory.items():
+        inventory_breakdown[blood_group] = {
+            'units': inv_data.get('units', 0),
+            'donors': len(inv_data.get('donors', [])),
+            'status': 'critical' if inv_data.get('units', 0) < 20 else ('low' if inv_data.get('units', 0) < 40 else 'adequate')
+        }
+    
+    return jsonify({
+        'success': True,
+        'timestamp': datetime.now().isoformat(),
+        'stats': stats,
+        'inventory_breakdown': inventory_breakdown
+    })
+
+@app.route('/api/inventory/update-donor/<donor_id>')
+def api_update_inventory_for_donor(donor_id):
+    """
+    API endpoint to update inventory when a new donor registers
+    Called automatically after donor registration
+    """
+    donor = donors_db.get(donor_id)
+    if not donor:
+        return jsonify({'success': False, 'message': 'Donor not found'}), 404
+    
+    blood_group = donor.get('blood_group')
+    # Ensure donor is in the inventory list
+    if donor_id not in blood_inventory[blood_group]['donors']:
+        blood_inventory[blood_group]['donors'].append(donor_id)
+        save_json_file(INVENTORY_FILE, blood_inventory)
+    
+    return jsonify({
+        'success': True,
+        'message': f'Donor {donor_id} added to {blood_group} inventory',
+        'blood_group': blood_group,
+        'donor_count': len(blood_inventory[blood_group]['donors']),
+        'units': blood_inventory[blood_group].get('units', 0)
+    })
 
 @app.route('/request/<request_id>/fulfill', methods=['POST'])
 def fulfill_request(request_id):

@@ -3,7 +3,7 @@
 {% block title %}Admin - Dashboard{% endblock %}
 
 {% block content %}
-<section class="clean-dashboard py-4">
+<section class="clean-dashboard py-4" data-page="dashboard">
   <div class="container">
     <div class="row mb-4">
       <div class="col-12">
@@ -16,7 +16,7 @@
       <div class="col-sm-6 col-md-3">
         <div class="card stat-card clean">
           <div class="card-body text-center">
-            <div class="stat-value">{{ stats.total_donors }}</div>
+            <div class="stat-value" data-dashboard-stat="total-donors">{{ stats.total_donors }}</div>
             <div class="stat-label">Donors</div>
           </div>
         </div>
@@ -24,7 +24,7 @@
       <div class="col-sm-6 col-md-3">
         <div class="card stat-card clean">
           <div class="card-body text-center">
-            <div class="stat-value">{{ stats.total_requests }}</div>
+            <div class="stat-value" data-dashboard-stat="total-requests">{{ stats.total_requests }}</div>
             <div class="stat-label">Requests</div>
           </div>
         </div>
@@ -32,7 +32,7 @@
       <div class="col-sm-6 col-md-3">
         <div class="card stat-card clean">
           <div class="card-body text-center">
-            <div class="stat-value">{{ stats.fulfilled_requests }}</div>
+            <div class="stat-value" data-dashboard-stat="fulfilled-requests">{{ stats.fulfilled_requests }}</div>
             <div class="stat-label">Fulfilled</div>
           </div>
         </div>
@@ -40,7 +40,7 @@
       <div class="col-sm-6 col-md-3">
         <div class="card stat-card clean">
           <div class="card-body text-center">
-            <div class="stat-value">{{ stats.total_units }}</div>
+            <div class="stat-value" data-dashboard-stat="total-units">{{ stats.total_units }}</div>
             <div class="stat-label">Units</div>
           </div>
         </div>

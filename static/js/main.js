@@ -308,9 +308,214 @@ function visualizeMatching(donors, requestBloodGroup) {
     return matchedDonors;
 }
 
+// ============== REAL-TIME UPDATE FUNCTIONS ==============
+
+/**
+ * Fetch real-time inventory data from API
+ */
+function fetchRealtimeInventory() {
+    fetch('/api/inventory/real-time')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateInventoryDisplay(data.inventory);
+                updateInventoryStats(data);
+            }
+        })
+        .catch(error => console.log('Inventory update error:', error));
+}
+
+/**
+ * Update inventory display with real-time data
+ */
+function updateInventoryDisplay(inventory) {
+    Object.keys(inventory).forEach(bloodGroup => {
+        const invData = inventory[bloodGroup];
+        
+        // Update units display
+        const unitsElement = document.querySelector(`[data-blood-group="${bloodGroup}"] .units-value`);
+        if (unitsElement) {
+            unitsElement.textContent = invData.units;
+        }
+        
+        // Update donor count
+        const donorCountElement = document.querySelector(`[data-blood-group="${bloodGroup}"] .donor-count`);
+        if (donorCountElement) {
+            donorCountElement.textContent = `${invData.donor_count} donor(s)`;
+        }
+        
+        // Update status badge
+        const statusElement = document.querySelector(`[data-blood-group="${bloodGroup}"] .status-badge`);
+        if (statusElement) {
+            statusElement.textContent = invData.status.toUpperCase();
+            statusElement.className = `badge status-badge bg-${getStatusColor(invData.status)}`;
+        }
+        
+        // Update progress bar
+        const progressBar = document.querySelector(`[data-blood-group="${bloodGroup}"] .progress-bar`);
+        if (progressBar) {
+            progressBar.style.width = (invData.units * 100 / 100) + '%';
+        }
+    });
+}
+
+/**
+ * Update inventory statistics
+ */
+function updateInventoryStats(data) {
+    // Update total units
+    const totalUnitsElement = document.querySelector('[data-stat="total-units"]');
+    if (totalUnitsElement) {
+        totalUnitsElement.textContent = data.total_units;
+    }
+    
+    // Update total donors
+    const totalDonorsElement = document.querySelector('[data-stat="total-donors"]');
+    if (totalDonorsElement) {
+        totalDonorsElement.textContent = data.total_donors;
+    }
+    
+    // Update critical groups count
+    const criticalElement = document.querySelector('[data-stat="critical-groups"]');
+    if (criticalElement) {
+        criticalElement.textContent = data.critical_groups.length;
+    }
+    
+    // Flash animation for updates
+    flashUpdateNotification();
+}
+
+/**
+ * Fetch real-time dashboard statistics
+ */
+function fetchDashboardStats() {
+    fetch('/api/dashboard/stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateDashboardStats(data.stats);
+                updateInventoryBreakdown(data.inventory_breakdown);
+            }
+        })
+        .catch(error => console.log('Dashboard update error:', error));
+}
+
+/**
+ * Update dashboard statistics display
+ */
+function updateDashboardStats(stats) {
+    // Update total donors
+    const donorsStat = document.querySelector('[data-dashboard-stat="total-donors"]');
+    if (donorsStat) {
+        donorsStat.textContent = stats.total_donors;
+    }
+    
+    // Update total requests
+    const requestsStat = document.querySelector('[data-dashboard-stat="total-requests"]');
+    if (requestsStat) {
+        requestsStat.textContent = stats.total_requests;
+    }
+    
+    // Update fulfilled requests
+    const fulfilledStat = document.querySelector('[data-dashboard-stat="fulfilled-requests"]');
+    if (fulfilledStat) {
+        fulfilledStat.textContent = stats.fulfilled_requests;
+    }
+    
+    // Update active requests
+    const activeStat = document.querySelector('[data-dashboard-stat="active-requests"]');
+    if (activeStat) {
+        activeStat.textContent = stats.active_requests;
+    }
+    
+    // Update total units
+    const unitsStat = document.querySelector('[data-dashboard-stat="total-units"]');
+    if (unitsStat) {
+        unitsStat.textContent = stats.total_units;
+    }
+}
+
+/**
+ * Update inventory breakdown table
+ */
+function updateInventoryBreakdown(breakdown) {
+    Object.keys(breakdown).forEach(bloodGroup => {
+        const data = breakdown[bloodGroup];
+        
+        // Update row data
+        const row = document.querySelector(`tr[data-blood-group="${bloodGroup}"]`);
+        if (row) {
+            // Update units cell
+            const unitsCell = row.querySelector('.units-cell');
+            if (unitsCell) unitsCell.textContent = data.units;
+            
+            // Update donors cell
+            const donorsCell = row.querySelector('.donors-cell');
+            if (donorsCell) donorsCell.textContent = data.donors;
+            
+            // Update status cell
+            const statusCell = row.querySelector('.status-cell');
+            if (statusCell) {
+                statusCell.innerHTML = `<span class="badge bg-${getStatusColor(data.status)}">${data.status.toUpperCase()}</span>`;
+            }
+        }
+    });
+}
+
+/**
+ * Get color code for status
+ */
+function getStatusColor(status) {
+    switch(status) {
+        case 'critical': return 'danger';
+        case 'low': return 'warning';
+        case 'adequate': return 'success';
+        default: return 'secondary';
+    }
+}
+
+/**
+ * Flash notification when data updates
+ */
+function flashUpdateNotification() {
+    const notif = document.querySelector('.update-notification');
+    if (notif) {
+        notif.style.opacity = '1';
+        setTimeout(() => {
+            notif.style.opacity = '0';
+        }, 2000);
+    }
+}
+
+/**
+ * Initialize real-time updates on page load
+ */
+function initRealtimeUpdates() {
+    // Check if we're on a page that needs real-time updates
+    const isInventoryPage = document.querySelector('[data-page="inventory"]');
+    const isDashboardPage = document.querySelector('[data-page="dashboard"]');
+    
+    // Initial fetch
+    if (isInventoryPage) {
+        fetchRealtimeInventory();
+    }
+    if (isDashboardPage) {
+        fetchDashboardStats();
+    }
+    
+    // Set up auto-refresh (every 10 seconds)
+    if (isInventoryPage || isDashboardPage) {
+        setInterval(() => {
+            if (isInventoryPage) fetchRealtimeInventory();
+            if (isDashboardPage) fetchDashboardStats();
+        }, 10000);
+    }
+}
+
 // Initialize on page load
 window.addEventListener('load', function() {
     validateRequestDate();
+    initRealtimeUpdates();
 });
 
 // Enable Bootstrap dropdowns on navbar
